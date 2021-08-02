@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>Sistema de Vendas</title>
+</h:head>
+<body>
+	<ui:include src="menu.xhtml" />
+	<p:spacer />
+	<h:form id="formAdd">
+
+		<p:growl id="messages" severity="info, warn, error, fatal"
+			autoUpdate="true" showDetail="true" />
+
+		<p:focus context="addVenda" />
+		<p:outputPanel id="addVenda">
+
+			<p:panel header="Pedido de Vendas" style="width: 100%">
+
+				<h:panelGrid columns="2" cellpadding="5" cellspacing="5" style="margin-top: 10px">
+
+					<p:outputLabel for="cliente" style="font-weight: bold" value="Cliente: " />
+					<p:selectOneMenu id="cliente" value="#{vendaController.venda.cliente}" 
+						required="true"	requiredMessage="* Selecione um Cliente">
+						<f:selectItem itemValue="" itemLabel="-- Selecione o Cliente --" />
+						<f:selectItems value="#{vendaController.carregaListaClientes()}"
+							var="cliente" itemLabel="#{cliente.nome}" itemValue="#{cliente}" />
+					</p:selectOneMenu>
+
+					<p:outputLabel for="produto" style="font-weight: bold" value="Produto: " />
+					<p:selectOneMenu id="produto" value="#{vendaController.venda.produto}" 
+						required="true"	requiredMessage="* Selecione um Produto">
+						<f:selectItem itemValue="" itemLabel="-- Selecione o Produto --" />
+						<f:selectItems value="#{vendaController.carregaListaProdutos()}"
+							var="produto" itemLabel="#{produto.descricao}" itemValue="#{produto}" />
+					</p:selectOneMenu>
+
+					<p:outputLabel for="quantidade" style="font-weight: bold"
+						value="Quantidade: " />
+					<p:inputText id="quantidade"
+						value="#{vendaController.venda.quantidade}" required="true"
+						requiredMessage="* Campo [Quantidade] &eacute; requerido"
+						size="10" maxlength="5" />
+
+				</h:panelGrid>
+
+				<p:separator style="width:100%;" />
+
+				<h:panelGrid columns="2" cellpadding="5" cellspacing="2"
+					style="margin-bottom:10px;">
+					<h:panelGroup>
+						<p:commandButton value="Salvar" action="#{vendaController.salvar}"
+							update="messages">
+						</p:commandButton>
+					</h:panelGroup>
+				</h:panelGrid>
+
+			</p:panel>
+		</p:outputPanel>
+	</h:form>
+
+	<p:separator style="width:100%;" />
+
+	<h:form id="formList">
+		<p:dataTable id="tblVenda" var="ven" value="#{vendaController.vendas}"
+			selection="#{vendaController.venda}" selectionMode="single"
+			rowKey="#{ven.id}" paginator="true" rows="10"
+			emptyMessage="Nenhum registro encontrado"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="10,15,25,50,100">
+
+			<p:ajax event="rowSelect" listener="#{vendaController.rowSelected}"
+				update=":formList:tblVenda" />
+
+			<f:facet name="header">Itens</f:facet>
+
+		</p:dataTable>
+	</h:form>
+</body>
+</html>

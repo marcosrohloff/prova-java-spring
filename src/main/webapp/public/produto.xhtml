@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<title>Sistema de Vendas</title>
+</h:head>
+<body>
+	<ui:include src="menu.xhtml" />
+	<p:spacer />
+	<h:form id="formAdd">
+
+		<p:growl id="messages" severity="info, warn, error, fatal" autoUpdate="true" showDetail="true" />
+
+		<p:focus context="addProduto" />
+		<p:outputPanel id="addProduto">
+
+			<p:panel header="Cadastro de Produtos" style="width: 100%">
+
+				<h:panelGrid columns="2" cellpadding="5" cellspacing="2" style="margin-top: 10px">
+
+					<p:outputLabel for="descricao" style="font-weight: bold" value="Descri&ccedil;&atilde;o: " />
+					<p:inputText id="descricao" value="#{produtoController.produto.descricao}" 
+					requiredMessage="* Campo [Descri&ccedil;&atilde;o] &eacute; requerido"
+					required="true" size="80" />
+					
+					<p:outputLabel for="valor" style="font-weight: bold" value="Valor: " />
+					<p:inputText id="valor" value="#{produtoController.produto.valor}"
+					required="true" requiredMessage="* Campo [Descri&ccedil;&atilde;o] &eacute; requerido"
+					size="10" maxlength="10">
+						<f:convertNumber pattern="#,##0.00" />
+					</p:inputText>
+					
+					<p:outputLabel for="qtdestoque" style="font-weight: bold" value="Estoque: " />
+					<p:inputText id="qtdestoque" value="#{produtoController.produto.qtdestoque}"
+					required="true" requiredMessage="* Campo [Estoque] &eacute; requerido"
+					size="10" maxlength="5" />			
+
+				</h:panelGrid>
+
+				<p:separator style="width:100%;" />
+
+				<h:panelGrid columns="2" cellpadding="5" cellspacing="2"
+					style="margin-bottom:10px;">
+					<h:panelGroup>
+						<p:commandButton value="Salvar"
+							action="#{produtoController.salvar}"
+							update="messages">
+						</p:commandButton>
+					</h:panelGroup>
+				</h:panelGrid>
+
+			</p:panel>
+		</p:outputPanel>
+	</h:form>
+
+	<p:separator style="width:100%;" />
+
+	<h:form id="formList">
+		<p:dataTable id="tblProduto" var="pro"
+			value="#{produtoController.produtos}"
+			selection="#{produtoController.produto}"
+            selectionMode="single"
+			rowKey="#{pro.id}" paginator="true" rows="10"
+			emptyMessage="Nenhum registro encontrado"
+			paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			rowsPerPageTemplate="10,15,25,50,100">
+
+			<p:ajax event="rowSelect" listener="#{produtoController.rowSelected}" update=":formList:tblProduto" />
+
+			<f:facet name="header">Produtos</f:facet>
+
+			<p:column headerText="ID" style="width: 5%;" sortBy="#{pro.id}">
+				<h:outputText value="#{pro.id}" />
+			</p:column>
+			<p:column headerText="Descri&ccedil;&atilde;o" style="width: 35%;">
+				<h:outputText value="#{pro.descricao}" />
+			</p:column>
+			<p:column headerText="Valor" style="width: 15%;">
+				<h:outputText value="#{pro.valor}" />
+			</p:column>
+			<p:column headerText="Qtde Estoque" style="width: 15%;">
+				<h:outputText value="#{pro.qtdestoque}" />
+			</p:column>	
+			<p:column style="text-align: center;">
+				<f:facet name="header">
+					<h:outputText value="Editar" />
+				</f:facet>
+				<p:commandButton action="#{produtoController.selecionar(produto)}" icon="ui-icon-pencil">				    
+					<f:ajax render=":addProduto :formAdd" execute="@form" />
+				</p:commandButton>
+			</p:column>
+			<p:column style="text-align: center;">
+				<f:facet name="header">
+					<h:outputText value="Excluir" />
+				</f:facet>
+				<p:commandButton icon="ui-icon-trash" update=":formList:tblProduto" type="button" onclick="PF('confirmDialog').show()" />  
+                <p:confirmDialog message="Deseja excluir o registro?" header="Aviso" severity="alert" widgetVar="confirmDialog">  
+                    <p:commandButton value="Sim" actionListener="#{produtoController.excluir}" 
+                    oncomplete="PF('confirmDialog').hide()" update=":formList:tblProduto" />  
+                    <p:commandButton value="Não" onclick="PF('confirmDialog').hide();" type="button" update=":formList:tblProduto" />
+                </p:confirmDialog>
+			</p:column>
+		</p:dataTable>
+	</h:form>
+</body>
+</html>
